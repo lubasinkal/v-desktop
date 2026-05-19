@@ -15,6 +15,12 @@ import * as rateConverter from './components/rate-converter.js'
 const appEl = document.querySelector('#app')
 appEl.innerHTML = ''
 
+// Background effects
+const bg = document.createElement('div')
+bg.className = 'bg-effects'
+bg.innerHTML = '<div class="dot-grid"></div><div class="orb-1"></div><div class="orb-2"></div>'
+appEl.appendChild(bg)
+
 renderNav(appEl)
 
 const tabs = [

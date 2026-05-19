@@ -1,33 +1,41 @@
 export function init(container) {
   container.innerHTML = `
     <div class="welcome">
-      <h2>v-desktop — Actuarial Workbench</h2>
-      <p class="subtitle">Powered by <strong>v-star</strong> engine. Select a tool from the tabs above.</p>
+      <h2>Actuarial Workbench</h2>
+      <p class="subtitle">Powered by <strong>v-star</strong> engine. Select a tool above.</p>
     </div>
-    <div class="dashboard-grid">
-      <div class="card quick-calc">
-        <h3>Quick PV</h3>
-        <div class="field"><label>Rate (i)</label><input id="dash-rate" type="number" value="0.05" step="0.001"></div>
-        <div class="field"><label>Amount</label><input id="dash-amount" type="number" value="100000"></div>
-        <div class="field"><label>Term (years)</label><input id="dash-term" type="number" value="20"></div>
-        <button onclick="window._dashCalc()">Calculate PV</button>
-        <div class="result-box" id="dash-result"></div>
+    <div class="terminal-box">
+      <div class="terminal-header">
+        <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+        <span class="terminal-title">lubasi@v-desktop ~ % ./quick-calc</span>
       </div>
-      <div class="card quick-calc">
-        <h3>Quick Annuity</h3>
-        <div class="field"><label>Age</label><input id="dash-age" type="number" value="65"></div>
-        <div class="field"><label>Amount</label><input id="dash-ann-amount" type="number" value="1000"></div>
-        <div class="field"><label>Rate (i)</label><input id="dash-ann-rate" type="number" value="0.05" step="0.001"></div>
-        <button onclick="window._dashAnn()">Calculate Annuity</button>
-        <div class="result-box" id="dash-ann-result"></div>
-      </div>
-      <div class="card quick-calc">
-        <h3>Quick Monte Carlo</h3>
-        <div class="field"><label>Paths</label><input id="dash-paths" type="number" value="10000"></div>
-        <div class="field"><label>Steps</label><input id="dash-steps" type="number" value="10"></div>
-        <div class="field"><label>Volatility</label><input id="dash-vol" type="number" value="0.15" step="0.01"></div>
-        <button onclick="window._dashMC()">Run</button>
-        <div class="result-box" id="dash-mc-result"></div>
+      <div class="terminal-body">
+        <div class="dashboard-grid">
+          <div class="card quick-calc">
+            <h3>Present Value</h3>
+            <div class="field"><label>Rate (i)</label><input id="dash-rate" type="number" value="0.05" step="0.001"></div>
+            <div class="field"><label>Amount</label><input id="dash-amount" type="number" value="100000"></div>
+            <div class="field"><label>Term</label><input id="dash-term" type="number" value="20"></div>
+            <button onclick="window._dashCalc()">Calculate PV</button>
+            <div class="result-box" id="dash-result"></div>
+          </div>
+          <div class="card quick-calc">
+            <h3>Life Annuity</h3>
+            <div class="field"><label>Age</label><input id="dash-age" type="number" value="65"></div>
+            <div class="field"><label>Amount</label><input id="dash-ann-amount" type="number" value="1000"></div>
+            <div class="field"><label>Rate</label><input id="dash-ann-rate" type="number" value="0.05" step="0.001"></div>
+            <button onclick="window._dashAnn()">Calculate</button>
+            <div class="result-box" id="dash-ann-result"></div>
+          </div>
+          <div class="card quick-calc">
+            <h3>Monte Carlo</h3>
+            <div class="field"><label>Paths</label><input id="dash-paths" type="number" value="10000"></div>
+            <div class="field"><label>Steps</label><input id="dash-steps" type="number" value="10"></div>
+            <div class="field"><label>Volatility</label><input id="dash-vol" type="number" value="0.15" step="0.01"></div>
+            <button onclick="window._dashMC()">Run</button>
+            <div class="result-box" id="dash-mc-result"></div>
+          </div>
+        </div>
       </div>
     </div>`
 
@@ -68,7 +76,7 @@ export function init(container) {
       resp.finalValues.forEach(v => { min = Math.min(min, v); max = Math.max(max, v); sum += v })
       const mean = sum / resp.finalValues.length
       document.getElementById('dash-mc-result').innerHTML =
-        `Mean: ${mean.toFixed(4)} | Min: ${min.toFixed(4)} | Max: ${max.toFixed(4)} (${numPaths.toLocaleString()} paths)`
+        `Mean: <strong>${mean.toFixed(4)}</strong> &nbsp;|&nbsp; Min: ${min.toFixed(4)} &nbsp;|&nbsp; Max: ${max.toFixed(4)}<br>${numPaths.toLocaleString()} paths`
     } catch (e) { document.getElementById('dash-mc-result').textContent = 'Error: ' + e }
   }
 }

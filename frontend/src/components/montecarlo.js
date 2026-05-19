@@ -5,6 +5,7 @@ let distChart = null
 
 export function init(container) {
   container.innerHTML = `
+    <div class="section-label">~/v-desktop &gt; monte-carlo</div>
     <h2>Monte Carlo Simulation</h2>
     <div class="calc-grid">
       <div class="card">
@@ -15,20 +16,28 @@ export function init(container) {
           </select>
         </div>
         <div class="field"><label>Initial Rate</label><input id="mc-init" type="number" value="0.05" step="0.001"></div>
-        <div class="field"><label>Drift / Long-Term Mean</label><input id="mc-mean" type="number" value="0.05" step="0.001"></div>
-        <div class="field"><label>Mean Reversion Speed (Vasicek)</label><input id="mc-rev" type="number" value="0.5" step="0.01"></div>
+        <div class="calc-grid" style="gap:8px">
+          <div class="field"><label>Drift / LT Mean</label><input id="mc-mean" type="number" value="0.05" step="0.001"></div>
+          <div class="field"><label>Mean Rev Speed</label><input id="mc-rev" type="number" value="0.5" step="0.01"></div>
+        </div>
         <div class="field"><label>Volatility</label><input id="mc-vol" type="number" value="0.02" step="0.001"></div>
-        <div class="field"><label>Number of Paths</label><input id="mc-paths" type="number" value="10000"></div>
-        <div class="field"><label>Steps</label><input id="mc-steps" type="number" value="10"></div>
-        <div class="field"><label>dt</label><input id="mc-dt" type="number" value="1.0" step="0.1"></div>
-        <div class="field"><label>Seed (0 = random)</label><input id="mc-seed" type="number" value="42"></div>
-        <button onclick="window._mcRun()">Run Simulation</button>
+        <div class="calc-grid" style="gap:8px">
+          <div class="field"><label>Paths</label><input id="mc-paths" type="number" value="10000"></div>
+          <div class="field"><label>Steps</label><input id="mc-steps" type="number" value="10"></div>
+        </div>
+        <div class="calc-grid" style="gap:8px">
+          <div class="field"><label>dt</label><input id="mc-dt" type="number" value="1.0" step="0.1"></div>
+          <div class="field"><label>Seed (0=random)</label><input id="mc-seed" type="number" value="42"></div>
+        </div>
+        <button onclick="window._mcRun()" style="width:100%">Run Simulation</button>
       </div>
-      <div class="card" id="mc-results-card">
-        <h3>Summary Statistics</h3>
+      <div class="card">
+        <h3>Summary</h3>
         <div id="mc-stats"></div>
-        <button onclick="window._mcComputeRisk()">Compute Risk Metrics</button>
-        <div id="mc-risk-result"></div>
+        <div style="margin-top:12px">
+          <button onclick="window._mcComputeRisk()" class="btn-secondary">Compute Risk Metrics</button>
+        </div>
+        <div class="result-box" id="mc-risk-result"></div>
       </div>
     </div>
     <div class="card">
@@ -52,6 +61,7 @@ export function init(container) {
       dt: parseFloat(document.getElementById('mc-dt').value),
       seed: parseInt(document.getElementById('mc-seed').value),
     }
+    document.getElementById('mc-stats').textContent = 'Running...'
     try {
       const resp = model === 'gbm'
         ? await window.go.main.App.RunGBM(req)
@@ -69,28 +79,30 @@ export function init(container) {
         `Paths: ${fv.length.toLocaleString()}<br>
          Mean: <strong>${mean.toFixed(4)}</strong><br>
          Std Dev: <strong>${std.toFixed(4)}</strong><br>
-         Min: ${min.toFixed(4)}<br>
-         Max: ${max.toFixed(4)}<br>
-         Sample paths charted: ${resp.samplePathsCount}`
+         Min: ${min.toFixed(4)} &nbsp;|&nbsp; Max: ${max.toFixed(4)}`
 
       window._mcFinalValues = fv
+      document.getElementById('mc-risk-result').innerHTML = ''
 
-      // Plot path chart
+      // Path chart
       destroyChart(pathChart)
       const labels = resp.paths.map(p => p.step)
       const datasets = []
-      for (let i = 0; i < resp.paths[0]?.values?.length && i < 20; i++) {
+      const colors = ['#3cffd0', '#5200ff', '#3860be', '#ff5f57', '#febc2e', '#28c840', '#ff8c00', '#ff69b4']
+      for (let i = 0; i < resp.paths[0]?.values?.length && i < 8; i++) {
         datasets.push({
           label: `Path ${i + 1}`,
           data: resp.paths.map(p => p.values[i]),
-          borderWidth: 0.8,
+          borderWidth: 1,
           pointRadius: 0,
-          borderColor: `hsl(${(i * 137.5) % 360}, 60%, 50%)`,
+          borderColor: colors[i % colors.length],
         })
       }
-      pathChart = createLineChart(document.getElementById('mc-path-chart'), labels, datasets)
+      pathChart = createLineChart(document.getElementById('mc-path-chart'), labels, datasets, {
+        plugins: { legend: { display: false } },
+      })
 
-      // Plot distribution histogram
+      // Distribution histogram
       const bins = 20
       const binWidth = (max - min) / bins || 0.001
       const hist = new Array(bins).fill(0)
@@ -103,7 +115,7 @@ export function init(container) {
       const canvas = document.getElementById('mc-dist-chart')
       if (canvas) {
         const { createBarChart } = await import('../lib/charts.js')
-        distChart = createBarChart(canvas, binLabels, hist, 'Final Rate Distribution')
+        distChart = createBarChart(canvas, binLabels, hist, 'Final Rate Distribution', '#3cffd0')
       }
     } catch (e) { document.getElementById('mc-stats').textContent = 'Error: ' + e }
   }
@@ -111,7 +123,7 @@ export function init(container) {
   window._mcComputeRisk = async () => {
     const fv = window._mcFinalValues
     if (!fv || !fv.length) {
-      document.getElementById('mc-risk-result').textContent = 'Run simulation first'
+      document.getElementById('mc-risk-result').innerHTML = 'Run simulation first'
       return
     }
     try {

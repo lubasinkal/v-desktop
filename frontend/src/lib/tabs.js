@@ -5,14 +5,20 @@ const TABS = [
   { id: 'mortality', label: 'Mortality' },
   { id: 'reserves', label: 'Reserves' },
   { id: 'montecarlo', label: 'Monte Carlo' },
-  { id: 'risk', label: 'Risk Metrics' },
-  { id: 'census', label: 'CSV Census' },
-  { id: 'rate-converter', label: 'Rate Converter' },
+  { id: 'risk', label: 'Risk' },
+  { id: 'census', label: 'Census' },
+  { id: 'rate-converter', label: 'Rates' },
 ]
 
 export function renderNav(container) {
   const nav = document.createElement('nav')
   nav.className = 'tab-nav'
+
+  const brand = document.createElement('span')
+  brand.className = 'tab-nav-brand'
+  brand.innerHTML = 'V-<span>DESKTOP</span>'
+  nav.appendChild(brand)
+
   TABS.forEach(t => {
     const btn = document.createElement('button')
     btn.className = 'tab-btn'

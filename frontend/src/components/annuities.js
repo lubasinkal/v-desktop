@@ -12,23 +12,28 @@ export async function init(container) {
   ]
 
   container.innerHTML = `
+    <div class="section-label">~/v-desktop &gt; annuities</div>
     <h2>Annuity Calculator</h2>
-    <div class="calc-grid">
-      <div class="card">
-        <div class="field"><label>Mortality Table</label>
-          <select id="ann-table">${tableNames.map(n => `<option>${n}</option>`).join('')}</select>
-        </div>
-        <div class="field"><label>Annuity Type</label>
-          <select id="ann-type">${types.map(t => `<option value="${t}">${t.replace(/-/g, ' ')}</option>`).join('')}</select>
-        </div>
-        <div class="field"><label>Age</label><input id="ann-age" type="number" value="65"></div>
-        <div class="field"><label>Term (years)</label><input id="ann-term" type="number" value="10"></div>
-        <div class="field"><label>Deferment</label><input id="ann-def" type="number" value="0"></div>
-        <div class="field"><label>Amount</label><input id="ann-amount" type="number" value="1000"></div>
-        <div class="field"><label>Interest Rate</label><input id="ann-rate" type="number" value="0.05" step="0.001"></div>
-        <button onclick="window._annCalc()">Calculate</button>
-        <div class="result-box" id="ann-result"></div>
+    <div class="card" style="max-width:600px">
+      <div class="field"><label>Mortality Table</label>
+        <select id="ann-table">${tableNames.map(n => `<option>${n}</option>`).join('')}</select>
       </div>
+      <div class="field"><label>Annuity Type</label>
+        <select id="ann-type">${types.map(t => `<option value="${t}">${t.replace(/-/g, ' ')}</option>`).join('')}</select>
+      </div>
+      <div class="calc-grid">
+        <div>
+          <div class="field"><label>Age</label><input id="ann-age" type="number" value="65"></div>
+          <div class="field"><label>Term</label><input id="ann-term" type="number" value="10"></div>
+          <div class="field"><label>Deferment</label><input id="ann-def" type="number" value="0"></div>
+        </div>
+        <div>
+          <div class="field"><label>Amount</label><input id="ann-amount" type="number" value="1000"></div>
+          <div class="field"><label>Rate</label><input id="ann-rate" type="number" value="0.05" step="0.001"></div>
+        </div>
+      </div>
+      <button onclick="window._annCalc()">Calculate</button>
+      <div class="result-box" id="ann-result"></div>
     </div>`
 
   window._annCalc = async () => {

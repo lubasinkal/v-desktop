@@ -10,6 +10,7 @@ export async function init(container) {
   } catch (e) { tableNames = ['cso2017_male'] }
 
   container.innerHTML = `
+    <div class="section-label">~/v-desktop &gt; mortality</div>
     <h2>Mortality Tables</h2>
     <div class="calc-grid">
       <div class="card">
@@ -18,26 +19,27 @@ export async function init(container) {
             ${tableNames.map(n => `<option>${n}</option>`).join('')}
           </select>
         </div>
-        <div class="field"><label>Age (for single query)</label><input id="mort-age" type="number" value="65"></div>
-        <div class="field"><label>Term</label><input id="mort-term" type="number" value="10"></div>
+        <div class="calc-grid" style="gap:8px">
+          <div class="field"><label>Age</label><input id="mort-age" type="number" value="65"></div>
+          <div class="field"><label>Term</label><input id="mort-term" type="number" value="10"></div>
+        </div>
         <button onclick="window._mortQuery()">Query</button>
         <div class="result-box" id="mort-query-result"></div>
       </div>
       <div class="card">
-        <h3>Load Custom CSV</h3>
+        <h3>Load Custom</h3>
         <div class="field"><label>Table Name</label><input id="mort-custom-name" type="text" placeholder="my_table"></div>
-        <div class="field">
-          <input type="file" id="mort-file" accept=".csv">
-        </div>
-        <button onclick="window._mortLoadFile()">Load &nbsp;Table</button>
+        <button onclick="window._mortLoadFile()">Select CSV File</button>
         <div class="result-box" id="mort-load-result"></div>
       </div>
     </div>
-    <div id="mort-charts" class="card">
-      <div class="chart-wrap"><canvas id="mort-qx-chart"></canvas></div>
-      <div class="chart-wrap"><canvas id="mort-lx-chart"></canvas></div>
+    <div class="card">
+      <div class="chart-row">
+        <div class="chart-wrap"><canvas id="mort-qx-chart"></canvas></div>
+        <div class="chart-wrap"><canvas id="mort-lx-chart"></canvas></div>
+      </div>
     </div>
-    <div class="card" id="mort-table-wrap" style="max-height:400px;overflow:auto">
+    <div class="card" style="max-height:400px;overflow:auto">
       <h3>Table Data</h3>
       <div id="mort-table-data"></div>
     </div>`
@@ -54,10 +56,10 @@ export async function init(container) {
 
       destroyChart(qxChart); destroyChart(lxChart)
       qxChart = createLineChart(document.getElementById('mort-qx-chart'), data.ages, [
-        { label: 'q(x)', data: data.qx, borderColor: 'rgb(239, 68, 68)', borderWidth: 1.5, pointRadius: 0 },
+        { label: 'q(x)', data: data.qx, borderColor: '#ff5f57', borderWidth: 1.5, pointRadius: 0 },
       ])
       lxChart = createLineChart(document.getElementById('mort-lx-chart'), data.ages, [
-        { label: 'l(x) — radix 100,000', data: data.lx, borderColor: 'rgb(59, 130, 246)', borderWidth: 1.5, pointRadius: 0 },
+        { label: 'l(x) — radix 100,000', data: data.lx, borderColor: '#3cffd0', borderWidth: 1.5, pointRadius: 0 },
       ])
     } catch (e) { document.getElementById('mort-table-data').textContent = 'Error: ' + e }
   }
@@ -71,18 +73,35 @@ export async function init(container) {
       const px = await window.go.main.App.QueryPx(name, age, term)
       const ex = await window.go.main.App.QueryEx(name, age)
       document.getElementById('mort-query-result').innerHTML =
-        `Age ${age}: qx = <strong>${qx.toFixed(6)}</strong> | ${term}-year px = <strong>${px.toFixed(6)}</strong> | e(x) = <strong>${ex.toFixed(2)}</strong>`
+        `q<sub>${age}</sub> = <strong>${qx.toFixed(6)}</strong><br>
+         <sub>${age}</sub>p<sub>${term}</sub> = <strong>${px.toFixed(6)}</strong><br>
+         e<sub>${age}</sub> = <strong>${ex.toFixed(2)}</strong>`
     } catch (e) { document.getElementById('mort-query-result').textContent = 'Error: ' + e }
   }
 
   window._mortLoadFile = async () => {
     const name = document.getElementById('mort-custom-name').value
-    const fileInput = document.getElementById('mort-file')
-    if (!name || !fileInput.files.length) {
-      document.getElementById('mort-load-result').textContent = 'Please fill name and select file'
+    if (!name) {
+      document.getElementById('mort-load-result').textContent = 'Enter a table name first'
       return
     }
-    document.getElementById('mort-load-result').textContent = 'Selected: ' + fileInput.files[0].name + ' (Go backend uses file path — for now, use bundled tables)'
+    try {
+      const result = await window.runtime.OpenFileDialog({
+        filters: [{ displayName: 'CSV Files', pattern: '*.csv' }],
+        properties: ['openFile'],
+      })
+      if (result) {
+        await window.go.main.App.LoadTableFromFile(name, result)
+        document.getElementById('mort-load-result').textContent = `Loaded "${name}" from ${result}`
+        // Refresh table selector
+        const names = await window.go.main.App.GetTableNames()
+        const sel = document.getElementById('mort-table')
+        sel.innerHTML = names.map(n => `<option>${n}</option>`).join('')
+        window._mortLoad()
+      }
+    } catch (e) {
+      document.getElementById('mort-load-result').textContent = 'Error: ' + e
+    }
   }
 
   setTimeout(() => window._mortLoad(), 100)

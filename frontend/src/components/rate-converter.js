@@ -1,5 +1,6 @@
 export function init(container) {
   container.innerHTML = `
+    <div class="section-label">~/v-desktop &gt; rates</div>
     <h2>Rate Converter</h2>
     <div class="calc-grid">
       <div class="card">
@@ -10,7 +11,7 @@ export function init(container) {
           </select>
         </div>
         <div class="field"><label>Value</label><input id="rc-value" type="number" value="0.05" step="0.001"></div>
-        <div class="field"><label>Compounding Frequency</label>
+        <div class="field"><label>Compounding</label>
           <select id="rc-m">
             <option value="1">Annual (m=1)</option>
             <option value="2">Semi-Annual (m=2)</option>
@@ -23,7 +24,7 @@ export function init(container) {
         <div class="result-box" id="rc-result"></div>
       </div>
       <div class="card">
-        <h3>Annuity Certain (No Mortality)</h3>
+        <h3>Annuity Certain</h3>
         <div class="field"><label>Rate</label><input id="rc-ac-rate" type="number" value="0.05" step="0.001"></div>
         <div class="field"><label>Term (n)</label><input id="rc-ac-n" type="number" value="10"></div>
         <button onclick="window._rcAnnCertain()">Calculate</button>
@@ -40,9 +41,9 @@ export function init(container) {
     try {
       const resp = await window.go.main.App.ConvertRate(req)
       document.getElementById('rc-result').innerHTML =
-        `Effective Rate: <strong>${resp.effectiveRate.toFixed(6)}</strong> (${(resp.effectiveRate * 100).toFixed(4)}%)<br>
-         Nominal Rate (m=${req.compounding}): <strong>${resp.nominalRate.toFixed(6)}</strong> (${(resp.nominalRate * 100).toFixed(4)}%)<br>
-         Force of Interest (δ): <strong>${resp.forceOfInterest.toFixed(6)}</strong>`
+        `Effective: <strong>${(resp.effectiveRate * 100).toFixed(4)}%</strong><br>
+         Nominal (m=${req.compounding}): <strong>${(resp.nominalRate * 100).toFixed(4)}%</strong><br>
+         Force of Interest (δ): <strong>${(resp.forceOfInterest * 100).toFixed(4)}%</strong>`
     } catch (e) { document.getElementById('rc-result').textContent = 'Error: ' + e }
   }
 

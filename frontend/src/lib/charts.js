@@ -1,6 +1,10 @@
 import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
+// Global defaults for dark theme
+Chart.defaults.color = '#949494'
+Chart.defaults.borderColor = '#313131'
+
 export function createLineChart(canvas, labels, datasets, options = {}) {
   return new Chart(canvas, {
     type: 'line',
@@ -10,11 +14,32 @@ export function createLineChart(canvas, labels, datasets, options = {}) {
       maintainAspectRatio: false,
       animation: false,
       plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12, padding: 8, font: { size: 11 } } },
+        legend: {
+          position: 'top',
+          labels: {
+            boxWidth: 12,
+            padding: 8,
+            font: { size: 10, family: 'Space Mono, monospace' },
+            color: '#949494',
+          },
+        },
       },
       scales: {
-        x: { grid: { display: false } },
-        y: { beginAtZero: false },
+        x: {
+          grid: { color: '#313131', display: true },
+          ticks: { font: { size: 10, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
+        y: {
+          beginAtZero: false,
+          grid: { color: '#313131', display: true },
+          ticks: { font: { size: 10, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
+        y1: {
+          beginAtZero: false,
+          position: 'right',
+          grid: { display: false },
+          ticks: { font: { size: 10, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
       },
       ...options,
     },
@@ -29,8 +54,8 @@ export function createBarChart(canvas, labels, data, label, color) {
       datasets: [{
         label,
         data,
-        backgroundColor: color || 'rgba(59, 130, 246, 0.7)',
-        borderColor: color || 'rgb(59, 130, 246)',
+        backgroundColor: color || 'rgba(60, 255, 208, 0.4)',
+        borderColor: color || '#3cffd0',
         borderWidth: 1,
       }],
     },
@@ -42,8 +67,15 @@ export function createBarChart(canvas, labels, data, label, color) {
         legend: { display: false },
       },
       scales: {
-        x: { grid: { display: false } },
-        y: { beginAtZero: true },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 9, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#313131' },
+          ticks: { font: { size: 9, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
       },
     },
   })

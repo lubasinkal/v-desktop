@@ -4,7 +4,8 @@ let durationChart = null
 
 export function init(container) {
   container.innerHTML = `
-    <h2>Present Value & Duration</h2>
+    <div class="section-label">~/v-desktop &gt; present-value</div>
+    <h2>Present Value &amp; Duration</h2>
     <div class="calc-grid">
       <div class="card">
         <h3>Present Value</h3>
@@ -18,8 +19,8 @@ export function init(container) {
       <div class="card">
         <h3>Bulk PV</h3>
         <div class="field"><label>Rate</label><input id="pv-bulk-rate" type="number" value="0.05" step="0.001"></div>
-        <div class="field"><label>Records (JSON array [{sumAssured, term}])</label>
-          <textarea id="pv-bulk-records" rows="6">[{"sumAssured":100000,"term":20},{"sumAssured":50000,"term":15},{"sumAssured":200000,"term":30}]</textarea>
+        <div class="field"><label>Records</label>
+          <textarea id="pv-bulk-records" rows="5">[{"sumAssured":100000,"term":20},{"sumAssured":50000,"term":15},{"sumAssured":200000,"term":30}]</textarea>
         </div>
         <button onclick="window._pvBulk()">Process Bulk</button>
         <div class="result-box" id="pv-bulk-result"></div>
@@ -27,12 +28,14 @@ export function init(container) {
     </div>
     <div class="card">
       <h3>Duration Analysis</h3>
-      <div class="field"><label>Rate (i)</label><input id="pv-dur-rate" type="number" value="0.05" step="0.001"></div>
-      <div class="field"><label>Cash Flows (comma-separated)</label>
-        <input id="pv-cf" type="text" value="100,100,100,1100">
+      <div class="calc-grid">
+        <div>
+          <div class="field"><label>Rate (i)</label><input id="pv-dur-rate" type="number" value="0.05" step="0.001"></div>
+          <div class="field"><label>Cash Flows</label><input id="pv-cf" type="text" value="100,100,100,1100"></div>
+          <button onclick="window._pvDur()">Calculate</button>
+        </div>
+        <div class="result-box" id="pv-dur-result"></div>
       </div>
-      <button onclick="window._pvDur()">Calculate</button>
-      <div class="result-box" id="pv-dur-result"></div>
       <div class="chart-wrap"><canvas id="pv-dur-chart"></canvas></div>
     </div>`
 
@@ -50,7 +53,7 @@ export function init(container) {
       }
       const v = await window.go.main.App.V(rate)
       document.getElementById('pv-result').innerHTML =
-        `PV = <strong>${pv.toFixed(2)}</strong><br>v = ${v.toFixed(6)}${j !== 0 ? ` (v* with j=${j})` : ''}`
+        `PV = <strong>${pv.toFixed(2)}</strong><br>v = ${v.toFixed(6)}${j !== 0 ? ` &nbsp;|&nbsp; v* = ${(v * (1 + j)).toFixed(6)}` : ''}`
     } catch (e) { document.getElementById('pv-result').textContent = 'Error: ' + e }
   }
 
@@ -83,8 +86,8 @@ export function init(container) {
       const pvCF = cf.map((c, i) => c / Math.pow(1 + rate, i + 1))
       const canvas = document.getElementById('pv-dur-chart')
       durationChart = createLineChart(canvas, labels, [
-        { label: 'Cash Flow', data: cf, borderColor: 'rgb(59, 130, 246)', yAxisID: 'y' },
-        { label: 'PV of CF', data: pvCF, borderColor: 'rgb(239, 68, 68)', yAxisID: 'y1' },
+        { label: 'Cash Flow', data: cf, borderColor: '#3cffd0', yAxisID: 'y', pointRadius: 4 },
+        { label: 'PV of CF', data: pvCF, borderColor: '#5200ff', yAxisID: 'y1', pointRadius: 4 },
       ])
     } catch (e) { document.getElementById('pv-dur-result').textContent = 'Error: ' + e }
   }
