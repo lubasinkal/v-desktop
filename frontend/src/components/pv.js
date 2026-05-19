@@ -1,4 +1,4 @@
-import { destroyChart, createLineChart } from '../lib/charts.js'
+import { destroyChart, createGroupedBarChart } from '../lib/charts.js'
 
 let durationChart = null
 
@@ -85,9 +85,9 @@ export function init(container) {
       const labels = cf.map((_, i) => `t=${i + 1}`)
       const pvCF = cf.map((c, i) => c / Math.pow(1 + rate, i + 1))
       const canvas = document.getElementById('pv-dur-chart')
-      durationChart = createLineChart(canvas, labels, [
-        { label: 'Cash Flow', data: cf, borderColor: '#3cffd0', yAxisID: 'y', pointRadius: 4 },
-        { label: 'PV of CF', data: pvCF, borderColor: '#5200ff', yAxisID: 'y1', pointRadius: 4 },
+      durationChart = createGroupedBarChart(canvas, labels, [
+        { label: 'Cash Flow', data: cf, backgroundColor: 'rgba(60, 255, 208, 0.6)', borderColor: '#3cffd0', borderWidth: 1 },
+        { label: 'PV of CF', data: pvCF, backgroundColor: 'rgba(82, 0, 255, 0.5)', borderColor: '#5200ff', borderWidth: 1 },
       ])
     } catch (e) { document.getElementById('pv-dur-result').textContent = 'Error: ' + e }
   }

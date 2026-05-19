@@ -81,6 +81,39 @@ export function createBarChart(canvas, labels, data, label, color) {
   })
 }
 
+export function createGroupedBarChart(canvas, labels, datasets) {
+  return new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            boxWidth: 12, padding: 8,
+            font: { size: 10, family: 'Space Mono, monospace' },
+            color: '#949494',
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#313131' },
+          ticks: { font: { size: 10, family: 'JetBrains Mono, monospace' }, color: '#949494' },
+        },
+      },
+    },
+  })
+}
+
 export function destroyChart(chart) {
   if (chart) {
     chart.destroy()
