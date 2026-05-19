@@ -1,7 +1,5 @@
 package models
 
-import "github.com/lubasinkal/v-star/pkg/risk"
-
 type PVRequest struct {
 	InterestRate float64    `json:"interestRate"`
 	RateJ        float64    `json:"rateJ,omitempty"`
@@ -102,7 +100,17 @@ type RiskRequest struct {
 }
 
 type RiskResponse struct {
-	risk.RiskReport
+	Mean           float64 `json:"mean"`
+	StdDev         float64 `json:"stdDev"`
+	Min            float64 `json:"min"`
+	Max            float64 `json:"max"`
+	VaR95          float64 `json:"var95"`
+	VaR99          float64 `json:"var99"`
+	CTE95          float64 `json:"cte95"`
+	CTE99          float64 `json:"cte99"`
+	StdError       float64 `json:"stdError"`
+	Confidence95Lo float64 `json:"confidence95Lo"`
+	Confidence95Hi float64 `json:"confidence95Hi"`
 }
 
 type CensusRequest struct {

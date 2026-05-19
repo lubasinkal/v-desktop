@@ -365,17 +365,17 @@ export namespace models {
 	    }
 	}
 	export class RiskResponse {
-	    Mean: number;
-	    StdDev: number;
-	    Min: number;
-	    Max: number;
-	    VaR95: number;
-	    VaR99: number;
-	    CTE95: number;
-	    CTE99: number;
-	    StdError: number;
-	    Confidence95Lo: number;
-	    Confidence95Hi: number;
+	    mean: number;
+	    stdDev: number;
+	    min: number;
+	    max: number;
+	    var95: number;
+	    var99: number;
+	    cte95: number;
+	    cte99: number;
+	    stdError: number;
+	    confidence95Lo: number;
+	    confidence95Hi: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new RiskResponse(source);
@@ -383,17 +383,17 @@ export namespace models {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Mean = source["Mean"];
-	        this.StdDev = source["StdDev"];
-	        this.Min = source["Min"];
-	        this.Max = source["Max"];
-	        this.VaR95 = source["VaR95"];
-	        this.VaR99 = source["VaR99"];
-	        this.CTE95 = source["CTE95"];
-	        this.CTE99 = source["CTE99"];
-	        this.StdError = source["StdError"];
-	        this.Confidence95Lo = source["Confidence95Lo"];
-	        this.Confidence95Hi = source["Confidence95Hi"];
+	        this.mean = source["mean"];
+	        this.stdDev = source["stdDev"];
+	        this.min = source["min"];
+	        this.max = source["max"];
+	        this.var95 = source["var95"];
+	        this.var99 = source["var99"];
+	        this.cte95 = source["cte95"];
+	        this.cte99 = source["cte99"];
+	        this.stdError = source["stdError"];
+	        this.confidence95Lo = source["confidence95Lo"];
+	        this.confidence95Hi = source["confidence95Hi"];
 	    }
 	}
 	export class TableDataRequest {
