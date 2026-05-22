@@ -69,9 +69,10 @@ jobs:
 
       - name: Build (macOS)
         if: matrix.build.target == 'macos'
-        run: wails build -platform ${{ matrix.build.platform }} -o ${{ matrix.build.name }}
+        run: wails build -platform ${{ matrix.build.platform }} -nopackage -o ${{ matrix.build.name }}
 
       - name: Stage binaries
+        shell: bash
         run: |
           mkdir -p staging
           if [ "${{ matrix.build.target }}" = "windows" ]; then
