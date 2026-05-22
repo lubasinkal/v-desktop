@@ -6,6 +6,19 @@ Stop wrestling with Excel. Stop praying your VBA doesn't crash on the big file. 
 
 ![Wails build](https://github.com/lubasinkal/v-desktop/actions/workflows/build.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Latest release](https://img.shields.io/github/v/release/lubasinkal/v-desktop)
+
+[![Windows](https://img.shields.io/badge/Windows-download-blue?logo=windows)](https://github.com/lubasinkal/v-desktop/releases/latest)
+[![macOS](https://img.shields.io/badge/macOS-download-black?logo=apple)](https://github.com/lubasinkal/v-desktop/releases/latest)
+[![Linux](https://img.shields.io/badge/Linux-download-orange?logo=linux)](https://github.com/lubasinkal/v-desktop/releases/latest)
+
+Grab the latest build from [Releases](https://github.com/lubasinkal/v-desktop/releases/latest).
+
+| Platform | File to download |
+|----------|-----------------|
+| Windows | `windows-v-desktop-installer.exe` (installer) or `windows-v-desktop.exe` (portable) |
+| macOS | `macos-v-desktop` |
+| Linux | `linux-v-desktop` |
 
 ---
 
