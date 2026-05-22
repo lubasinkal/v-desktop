@@ -16,9 +16,9 @@ Grab the latest build from [Releases](https://github.com/lubasinkal/v-desktop/re
 
 | Platform | File to download |
 |----------|-----------------|
-| Windows | `windows-v-desktop-installer.exe` (installer) or `windows-v-desktop.exe` (portable) |
-| macOS | `macos-v-desktop` |
-| Linux | `linux-v-desktop` |
+| Windows | `v-desktop-windows-installer.exe` (installer) or `v-desktop-windows.exe` (portable) |
+| macOS | `v-desktop-macos` |
+| Linux | `v-desktop-linux` |
 
 ---
 

@@ -71,13 +71,22 @@ jobs:
         if: matrix.build.target == 'macos'
         run: wails build -platform ${{ matrix.build.platform }} -o ${{ matrix.build.name }}
 
+      - name: Stage binaries
+        run: |
+          mkdir -p staging
+          if [ "${{ matrix.build.target }}" = "windows" ]; then
+            cp build/bin/v-desktop staging/v-desktop.exe
+            [ -f build/output/v-desktop-installer.exe ] && cp build/output/v-desktop-installer.exe staging/v-desktop-installer.exe || true
+            [ -f build/bin/v-desktop-installer.exe ] && cp build/bin/v-desktop-installer.exe staging/v-desktop-installer.exe || true
+          else
+            cp build/bin/v-desktop staging/
+          fi
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.build.name }}-${{ matrix.build.target }}
-          path: |
-            build/bin/*
-            build/output/*
+          name: ${{ matrix.build.target }}
+          path: staging/*
 
   release:
     needs: build
@@ -90,14 +99,15 @@ jobs:
       - name: Flatten artifacts
         run: |
           mkdir -p release-artifacts
-          find artifacts -type f -exec sh -c '
-            for f; do
-              rel="${f#artifacts/}"
-              target="${rel%%/*}"
-              base="${rel##*/}"
-              cp "$f" "release-artifacts/$target-$base"
+          for dir in artifacts/*/; do
+            target=$(basename "$dir")
+            for file in "$dir"*; do
+              [ -f "$file" ] || continue
+              base=$(basename "$file")
+              suffix="${base#v-desktop}"
+              cp "$file" "release-artifacts/v-desktop-$target$suffix"
             done
-          ' sh {} +
+          done
           ls -la release-artifacts/
 
       - uses: softprops/action-gh-release@v2
