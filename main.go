@@ -103,21 +103,19 @@ func main() {
 		Height:           900,
 		Fullscreen:       false,
 		WindowStartState: options.Maximised,
-		Frameless:        true,
+		Frameless:        false,
 		MinWidth:         900,
 		MinHeight:        600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
+		BackgroundColour: &options.RGBA{R: 248, G: 249, B: 250, A: 1},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
 		},
 		Windows: &windows.Options{
-			WebviewIsTransparent: true,
-			WindowIsTranslucent:  true,
-			BackdropType:         windows.Mica,
+			BackdropType: windows.Mica,
 		},
 	})
 
