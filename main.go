@@ -13,6 +13,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed all:frontend/dist
@@ -97,16 +98,26 @@ func main() {
 	loadEmbeddedTables(app)
 
 	err := wails.Run(&options.App{
-		Title:  "v-desktop",
-		Width:  1280,
-		Height: 900,
+		Title:            "v-desktop",
+		Width:            1280,
+		Height:           900,
+		Fullscreen:       false,
+		WindowStartState: options.Maximised,
+		Frameless:        true,
+		MinWidth:         900,
+		MinHeight:        600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 248, G: 249, B: 250, A: 1},
+		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
+		},
+		Windows: &windows.Options{
+			WebviewIsTransparent: true,
+			WindowIsTranslucent:  true,
+			BackdropType:         windows.Mica,
 		},
 	})
 
