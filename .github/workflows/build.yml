@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"
 
@@ -49,6 +52,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
 
+      - name: Install NSIS
+        if: matrix.build.target == 'windows'
+        run: choco install nsis
+
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.12.0
 
@@ -56,12 +63,43 @@ jobs:
         if: matrix.build.target == 'linux'
         run: wails build -platform ${{ matrix.build.platform }} -tags webkit2_41 -o ${{ matrix.build.name }}
 
-      - name: Build (Windows / macOS)
-        if: matrix.build.target != 'linux'
+      - name: Build (Windows)
+        if: matrix.build.target == 'windows'
+        run: wails build -platform ${{ matrix.build.platform }} -nsis -o ${{ matrix.build.name }}
+
+      - name: Build (macOS)
+        if: matrix.build.target == 'macos'
         run: wails build -platform ${{ matrix.build.platform }} -o ${{ matrix.build.name }}
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.build.name }}-${{ matrix.build.target }}
-          path: build/bin/*
+          path: |
+            build/bin/*
+            build/output/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release-artifacts
+          for dir in artifacts/*/; do
+            target=$(basename "$dir")
+            for file in "$dir"/*; do
+              cp "$file" "release-artifacts/$target-$(basename "$file")"
+            done
+          done
+          ls -la release-artifacts/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
+          generate_release_notes: true
+          make_latest: true
