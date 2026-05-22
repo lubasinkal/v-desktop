@@ -90,12 +90,14 @@ jobs:
       - name: Flatten artifacts
         run: |
           mkdir -p release-artifacts
-          for dir in artifacts/*/; do
-            target=$(basename "$dir")
-            for file in "$dir"/*; do
-              cp "$file" "release-artifacts/$target-$(basename "$file")"
+          find artifacts -type f -exec sh -c '
+            for f; do
+              rel="${f#artifacts/}"
+              target="${rel%%/*}"
+              base="${rel##*/}"
+              cp "$f" "release-artifacts/$target-$base"
             done
-          done
+          ' sh {} +
           ls -la release-artifacts/
 
       - uses: softprops/action-gh-release@v2
