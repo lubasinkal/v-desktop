@@ -111,7 +111,7 @@ func main() {
 		},
 		BackgroundColour: &options.RGBA{R: 248, G: 249, B: 250, A: 1},
 		OnStartup:        app.startup,
-		Bind: []interface{}{
+		Bind: []any{
 			app,
 		},
 		Windows: &windows.Options{

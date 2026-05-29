@@ -1,3 +1,8 @@
+import { showToast } from '../lib/toast.js'
+import { validatePositive, validateRate, setButtonLoading, formatCurrency, copyToClipboard } from '../lib/utils.js'
+
+function id(s) { return document.getElementById(s) }
+
 export function init(container) {
   container.innerHTML = `
     <div class="section-label">~/v-desktop &gt; census</div>
@@ -11,13 +16,13 @@ export function init(container) {
           </div>
         </div>
         <div class="calc-grid" style="gap:8px">
-          <div class="field"><label>Rate</label><input id="census-rate" type="number" value="0.05" step="0.001"></div>
-          <div class="field"><label>Limit (0 = all)</label><input id="census-limit" type="number" value="0"></div>
+          <div class="field"><label>Rate</label><input id="census-rate" type="number" value="0.05" step="0.001" min="0" max="1"></div>
+          <div class="field"><label>Limit (0 = all)</label><input id="census-limit" type="number" value="0" min="0"></div>
         </div>
-        <div class="field"><label>Workers (parallel)</label><input id="census-workers" type="number" value="8"></div>
+        <div class="field"><label>Workers (parallel)</label><input id="census-workers" type="number" value="8" min="1"></div>
         <div style="display:flex;gap:8px">
-          <button onclick="window._censusRun()">Process</button>
-          <button onclick="window._censusRunParallel()" class="btn-secondary">Parallel</button>
+          <button id="census-btn" onclick="window._censusRun()">Process</button>
+          <button id="census-par-btn" onclick="window._censusRunParallel()" class="btn-secondary">Parallel</button>
         </div>
         <div class="result-box" id="census-status"></div>
       </div>
@@ -36,59 +41,72 @@ export function init(container) {
         properties: ['openFile'],
       })
       if (result) {
-        document.getElementById('census-path').value = result
+        id('census-path').value = result
+        showToast('File selected', 'info')
       }
     } catch (e) {
-      document.getElementById('census-status').textContent = 'Dialog unavailable in dev mode'
+      id('census-status').textContent = 'Dialog unavailable in dev mode'
     }
   }
 
   const showResults = (resp) => {
-    document.getElementById('census-summary').innerHTML =
-      `<span class="terminal-prompt">~</span> Processed <strong>${resp.recordCount}</strong> records in ${resp.processingMs}ms &nbsp;|&nbsp; Total PV: <strong>${resp.totalPV.toFixed(2)}</strong>`
+    const summaryEl = id('census-summary')
+    summaryEl.innerHTML =
+      `<span class="terminal-prompt">~</span> Processed <strong>${resp.recordCount}</strong> records in ${resp.processingMs}ms &nbsp;|&nbsp; Total PV: <strong>${formatCurrency(resp.totalPV)}</strong>`
+    summaryEl.innerHTML += ` <button class="copy-btn" onclick="window._copyText('Census: ${resp.recordCount} records, ${resp.processingMs}ms, Total PV: ${resp.totalPV.toFixed(2)}')">Copy</button>`
 
     let html = '<tr><th>Sex</th><th>Type</th><th>Age</th><th>Sum Assured</th><th>Term</th><th>PV</th></tr>'
     const maxRows = 100
     const showRecords = resp.records.slice(0, maxRows)
     showRecords.forEach(r => {
-      html += `<tr><td>${r.sex}</td><td>${r.policyType}</td><td>${r.age}</td><td>${r.sumAssured.toFixed(2)}</td><td>${r.term}</td><td>${r.presentValue.toFixed(2)}</td></tr>`
+      html += `<tr><td>${r.sex}</td><td>${r.policyType}</td><td>${r.age}</td><td>${formatCurrency(r.sumAssured)}</td><td>${r.term}</td><td>${formatCurrency(r.presentValue)}</td></tr>`
     })
     if (resp.records.length > maxRows) {
       html += `<tr><td colspan="6" style="color:#949494">... and ${resp.records.length - maxRows} more rows</td></tr>`
     }
-    document.getElementById('census-table').innerHTML = html
-    document.getElementById('census-status').innerHTML = 'Done'
+    id('census-table').innerHTML = html
+    id('census-status').innerHTML = 'Done'
   }
 
   window._censusRun = async () => {
-    const req = {
-      filePath: document.getElementById('census-path').value,
-      interestRate: parseFloat(document.getElementById('census-rate').value),
-      rateJ: 0,
-      limit: parseInt(document.getElementById('census-limit').value),
-      workers: 1,
-    }
-    if (!req.filePath) { document.getElementById('census-status').textContent = 'Enter file path'; return }
-    document.getElementById('census-status').innerHTML = '<span class="terminal-prompt">~</span> Processing...'
+    const filePath = id('census-path').value
+    const rate = parseFloat(id('census-rate').value)
+    if (!filePath) { showToast('Enter file path', 'warning'); return }
+    if (validateRate(rate)) { showToast(validateRate(rate), 'warning'); return }
+
+    const req = { filePath, interestRate: rate, rateJ: 0, limit: parseInt(id('census-limit').value), workers: 1 }
+    id('census-status').innerHTML = '<span class="spinner" style="border-top-color:#3cffd0"></span> Processing...'
+    setButtonLoading(id('census-btn'), true)
     try {
       const resp = await window.go.main.App.ProcessCensus(req)
       showResults(resp)
-    } catch (e) { document.getElementById('census-status').textContent = 'Error: ' + e }
+      showToast(`Processed ${resp.recordCount} records in ${resp.processingMs}ms`, 'success')
+    } catch (e) { id('census-status').textContent = 'Error: ' + e; showToast('Processing failed', 'error') }
+    finally { setButtonLoading(id('census-btn'), false) }
   }
 
   window._censusRunParallel = async () => {
+    const filePath = id('census-path').value
+    const rate = parseFloat(id('census-rate').value)
+    if (!filePath) { showToast('Enter file path', 'warning'); return }
+    if (validateRate(rate)) { showToast(validateRate(rate), 'warning'); return }
+
     const req = {
-      filePath: document.getElementById('census-path').value,
-      interestRate: parseFloat(document.getElementById('census-rate').value),
-      rateJ: 0,
-      limit: parseInt(document.getElementById('census-limit').value),
-      workers: parseInt(document.getElementById('census-workers').value),
+      filePath, interestRate: rate, rateJ: 0,
+      limit: parseInt(id('census-limit').value),
+      workers: parseInt(id('census-workers').value),
     }
-    if (!req.filePath) { document.getElementById('census-status').textContent = 'Enter file path'; return }
-    document.getElementById('census-status').innerHTML = '<span class="terminal-prompt">~</span> Processing parallel...'
+    id('census-status').innerHTML = '<span class="spinner" style="border-top-color:#3cffd0"></span> Processing parallel...'
+    setButtonLoading(id('census-par-btn'), true)
     try {
       const resp = await window.go.main.App.ProcessCensusParallel(req)
       showResults(resp)
-    } catch (e) { document.getElementById('census-status').textContent = 'Error: ' + e }
+      showToast(`Processed ${resp.recordCount} records in ${resp.processingMs}ms (parallel)`, 'success')
+    } catch (e) { id('census-status').textContent = 'Error: ' + e; showToast('Processing failed', 'error') }
+    finally { setButtonLoading(id('census-par-btn'), false) }
+  }
+
+  window._copyText = async text => {
+    if (await copyToClipboard(text)) showToast('Copied', 'success')
   }
 }

@@ -1,5 +1,6 @@
 import './style.css'
 import './app.css'
+import './lib/toast.js'
 
 import { renderNav, switchTab, createTabContent } from './lib/tabs.js'
 import * as dashboard from './components/dashboard.js'
@@ -15,7 +16,6 @@ import * as rateConverter from './components/rate-converter.js'
 const appEl = document.querySelector('#app')
 appEl.innerHTML = ''
 
-// Background effects
 const bg = document.createElement('div')
 bg.className = 'bg-effects'
 bg.innerHTML = '<div class="dot-grid"></div><div class="orb-1"></div><div class="orb-2"></div>'
@@ -42,3 +42,11 @@ tabs.forEach(t => {
 })
 
 switchTab('dashboard')
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+    const idx = parseInt(e.key) - 1
+    if (idx < tabs.length) switchTab(tabs[idx].id)
+  }
+})

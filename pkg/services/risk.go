@@ -1,8 +1,6 @@
 package services
 
 import (
-	"sort"
-
 	"github.com/lubasinkal/v-star/pkg/risk"
 	"v-desktop/pkg/models"
 )
@@ -17,7 +15,9 @@ func (s *RiskService) ComputeRiskMetrics(losses []float64) models.RiskResponse {
 	if len(losses) == 0 {
 		return models.RiskResponse{}
 	}
-	r := risk.ComputeReport(losses)
+	buf := make([]float64, len(losses))
+	copy(buf, losses)
+	r := risk.ComputeReport(buf)
 	return models.RiskResponse{
 		Mean:           r.Mean,
 		StdDev:         r.StdDev,
@@ -34,16 +34,13 @@ func (s *RiskService) ComputeRiskMetrics(losses []float64) models.RiskResponse {
 }
 
 func (s *RiskService) VaR(losses []float64, confidence float64) float64 {
-	return risk.VaR(losses, confidence)
+	buf := make([]float64, len(losses))
+	copy(buf, losses)
+	return risk.VaR(buf, confidence)
 }
 
 func (s *RiskService) CTE(losses []float64, confidence float64) float64 {
-	return risk.CTE(losses, confidence)
-}
-
-func (s *RiskService) SortLosses(losses []float64) []float64 {
-	sorted := make([]float64, len(losses))
-	copy(sorted, losses)
-	sort.Float64s(sorted)
-	return sorted
+	buf := make([]float64, len(losses))
+	copy(buf, losses)
+	return risk.CTE(buf, confidence)
 }

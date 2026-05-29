@@ -47,10 +47,7 @@ func (s *StochasticService) processPaths(paths []stochastic.RatePath, steps int)
 	}
 
 	// sample up to 50 paths for charting
-	sampleCount := 50
-	if len(paths) < sampleCount {
-		sampleCount = len(paths)
-	}
+	sampleCount := min(len(paths), 50)
 	stepSize := len(paths) / sampleCount
 
 	var pathPoints []models.PathPoint

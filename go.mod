@@ -3,7 +3,7 @@ module v-desktop
 go 1.26.1
 
 require (
-	github.com/lubasinkal/v-star v0.7.0
+	github.com/lubasinkal/v-star v0.8.0
 	github.com/wailsapp/wails/v2 v2.12.0
 )
 
@@ -37,5 +37,3 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 )
-
-// replace github.com/wailsapp/wails/v2 v2.12.0 => C:\Users\Nkalolang\go\pkg\mod
