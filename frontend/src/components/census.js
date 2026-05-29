@@ -3,6 +3,8 @@ import { validatePositive, validateRate, setButtonLoading, formatCurrency, copyT
 
 function id(s) { return document.getElementById(s) }
 
+let _pendingCensusContent = null // CSV content from HTML file input fallback
+
 export function init(container) {
   container.innerHTML = `
     <div class="section-label">~/v-desktop &gt; census</div>
@@ -13,6 +15,7 @@ export function init(container) {
           <div style="display:flex;gap:8px">
             <input id="census-path" type="text" placeholder="path/to/policies.csv" style="flex:1">
             <button onclick="window._censusBrowse()" class="btn-secondary" style="white-space:nowrap">Browse</button>
+            <input id="census-file-input" type="file" accept=".csv" style="display:none" onchange="window._censusFileSelected(event)">
           </div>
         </div>
         <div class="calc-grid" style="gap:8px">
@@ -42,11 +45,30 @@ export function init(container) {
       })
       if (result) {
         id('census-path').value = result
+        _pendingCensusContent = null
         showToast('File selected', 'info')
       }
     } catch (e) {
-      id('census-status').textContent = 'Dialog unavailable in dev mode'
+      // Runtime dialog unavailable (dev mode) — use HTML file input fallback
+      id('census-file-input').click()
     }
+  }
+
+  window._censusFileSelected = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    id('census-path').value = file.name
+    // Read file content for backend processing
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      _pendingCensusContent = e.target.result
+      showToast('File loaded: ' + file.name, 'success')
+    }
+    reader.onerror = () => {
+      showToast('Failed to read file', 'error')
+    }
+    reader.readAsText(file)
+    event.target.value = ''
   }
 
   const showResults = (resp) => {
@@ -78,7 +100,13 @@ export function init(container) {
     id('census-status').innerHTML = '<span class="spinner" style="border-top-color:#3cffd0"></span> Processing...'
     setButtonLoading(id('census-btn'), true)
     try {
-      const resp = await window.go.main.App.ProcessCensus(req)
+      let resp
+      if (_pendingCensusContent) {
+        resp = await window.go.main.App.ProcessCensusFromData(req, _pendingCensusContent)
+        _pendingCensusContent = null
+      } else {
+        resp = await window.go.main.App.ProcessCensus(req)
+      }
       showResults(resp)
       showToast(`Processed ${resp.recordCount} records in ${resp.processingMs}ms`, 'success')
     } catch (e) { id('census-status').textContent = 'Error: ' + e; showToast('Processing failed', 'error') }
@@ -99,7 +127,13 @@ export function init(container) {
     id('census-status').innerHTML = '<span class="spinner" style="border-top-color:#3cffd0"></span> Processing parallel...'
     setButtonLoading(id('census-par-btn'), true)
     try {
-      const resp = await window.go.main.App.ProcessCensusParallel(req)
+      let resp
+      if (_pendingCensusContent) {
+        resp = await window.go.main.App.ProcessCensusFromData(req, _pendingCensusContent)
+        _pendingCensusContent = null
+      } else {
+        resp = await window.go.main.App.ProcessCensusParallel(req)
+      }
       showResults(resp)
       showToast(`Processed ${resp.recordCount} records in ${resp.processingMs}ms (parallel)`, 'success')
     } catch (e) { id('census-status').textContent = 'Error: ' + e; showToast('Processing failed', 'error') }

@@ -12,6 +12,7 @@ import * as montecarlo from './components/montecarlo.js'
 import * as risk from './components/risk.js'
 import * as census from './components/census.js'
 import * as rateConverter from './components/rate-converter.js'
+import * as profit from './components/profit.js'
 
 const appEl = document.querySelector('#app')
 appEl.innerHTML = ''
@@ -33,6 +34,7 @@ const tabs = [
   { id: 'risk', init: risk.init },
   { id: 'census', init: census.init },
   { id: 'rate-converter', init: rateConverter.init },
+  { id: 'profit', init: profit.init },
 ]
 
 tabs.forEach(t => {
@@ -43,10 +45,12 @@ tabs.forEach(t => {
 
 switchTab('dashboard')
 
-// Keyboard shortcuts
+// Keyboard shortcuts (Ctrl+1-9, Ctrl+0 for 10th)
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     const idx = parseInt(e.key) - 1
     if (idx < tabs.length) switchTab(tabs[idx].id)
+  } else if (e.ctrlKey && e.key === '0') {
+    if (tabs.length >= 10) switchTab(tabs[9].id)
   }
 })

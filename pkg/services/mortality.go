@@ -1,7 +1,10 @@
 package services
 
 import (
+	"encoding/csv"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/lubasinkal/v-star/pkg/mortality"
@@ -35,6 +38,82 @@ func (s *MortalityService) LoadTableFromFile(name, filepath string) error {
 	if err != nil {
 		return fmt.Errorf("load table %q from %s: %w", name, filepath, err)
 	}
+	s.RegisterTable(name, table)
+	return nil
+}
+
+// LoadTableFromData parses CSV content from a string and registers the table.
+// Expects columns: age, qx (or px) — same format as LoadTableFromFile.
+func (s *MortalityService) LoadTableFromData(name, csvContent string) error {
+	r := csv.NewReader(strings.NewReader(csvContent))
+	r.TrimLeadingSpace = true
+
+	rows, err := r.ReadAll()
+	if err != nil {
+		return fmt.Errorf("parse CSV: %w", err)
+	}
+	if len(rows) < 2 {
+		return fmt.Errorf("CSV must have a header and at least one data row")
+	}
+
+	// Find column indices
+	header := rows[0]
+	ageIdx, qxIdx, pxIdx := -1, -1, -1
+	for i, col := range header {
+		switch strings.TrimSpace(strings.ToLower(col)) {
+		case "age":
+			ageIdx = i
+		case "qx":
+			qxIdx = i
+		case "px":
+			pxIdx = i
+		}
+	}
+
+	if ageIdx < 0 {
+		return fmt.Errorf("CSV must have an 'age' column")
+	}
+	if qxIdx < 0 && pxIdx < 0 {
+		return fmt.Errorf("CSV must have a 'qx' or 'px' column")
+	}
+
+	// Build age→qx map (handles sparse ages)
+	maxAge := 0
+	ageQx := make(map[int]float64)
+	for _, row := range rows[1:] {
+		if len(row) <= ageIdx {
+			continue
+		}
+		age, err := strconv.Atoi(strings.TrimSpace(row[ageIdx]))
+		if err != nil {
+			continue
+		}
+		if age > maxAge {
+			maxAge = age
+		}
+
+		if qxIdx >= 0 && len(row) > qxIdx {
+			q, err := strconv.ParseFloat(strings.TrimSpace(row[qxIdx]), 64)
+			if err == nil {
+				ageQx[age] = q
+			}
+		} else if pxIdx >= 0 && len(row) > pxIdx {
+			p, err := strconv.ParseFloat(strings.TrimSpace(row[pxIdx]), 64)
+			if err == nil {
+				ageQx[age] = 1 - p // derive qx from px
+			}
+		}
+	}
+
+	// Build qx slice (fill missing ages with 0)
+	qx := make([]float64, maxAge+1)
+	for age, q := range ageQx {
+		if age >= 0 && age <= maxAge {
+			qx[age] = q
+		}
+	}
+
+	table := mortality.NewTable(name, qx)
 	s.RegisterTable(name, table)
 	return nil
 }

@@ -5,10 +5,27 @@ let tableNames = []
 
 function id(s) { return document.getElementById(s) }
 
+async function refreshTableDropdown() {
+  try {
+    const names = await window.go.main.App.GetTableNames()
+    if (names.length > 0) {
+      tableNames = names
+      const sel = document.getElementById('ann-table')
+      if (sel) {
+        const current = sel.value
+        sel.innerHTML = names.map(n => `<option>${n}</option>`).join('')
+        if (names.includes(current)) sel.value = current
+      }
+    }
+  } catch (_) {}
+}
+
 export async function init(container) {
   try {
     tableNames = await window.go.main.App.GetTableNames()
   } catch (e) { tableNames = ['cso2017_male'] }
+
+  window.addEventListener('tables-updated', refreshTableDropdown)
 
   const types = [
     'whole-life-immediate', 'whole-life-due', 'term-immediate', 'term-due',

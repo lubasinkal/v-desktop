@@ -36,6 +36,8 @@ export function Greet(arg1:string):Promise<string>;
 
 export function InterestFromForce(arg1:number):Promise<number>;
 
+export function LoadTableFromData(arg1:string,arg2:string):Promise<void>;
+
 export function LoadTableFromFile(arg1:string,arg2:string):Promise<void>;
 
 export function MacaulayDuration(arg1:number,arg2:Array<number>):Promise<number>;
@@ -45,6 +47,8 @@ export function ModifiedDuration(arg1:number,arg2:Array<number>):Promise<number>
 export function NominalToEffective(arg1:number,arg2:number):Promise<number>;
 
 export function ProcessCensus(arg1:models.CensusRequest):Promise<models.CensusResponse>;
+
+export function ProcessCensusFromData(arg1:models.CensusRequest,arg2:string):Promise<models.CensusResponse>;
 
 export function ProcessCensusParallel(arg1:models.CensusRequest):Promise<models.CensusResponse>;
 
@@ -57,6 +61,8 @@ export function QueryPx(arg1:string,arg2:number,arg3:number):Promise<number>;
 export function QueryQx(arg1:string,arg2:number):Promise<number>;
 
 export function RunGBM(arg1:models.MonteCarloRequest):Promise<models.MonteCarloResponse>;
+
+export function RunProfitTest(arg1:models.ProfitRequest):Promise<models.ProfitResponse>;
 
 export function RunVasicek(arg1:models.MonteCarloRequest):Promise<models.MonteCarloResponse>;
 

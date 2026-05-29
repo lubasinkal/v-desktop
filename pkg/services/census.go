@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strings"
 	"time"
 
 	"github.com/lubasinkal/v-star/pkg/concurrency"
@@ -13,6 +14,46 @@ type CensusService struct{}
 
 func NewCensusService() *CensusService {
 	return &CensusService{}
+}
+
+func (s *CensusService) ProcessCensusFromData(req models.CensusRequest, csvContent string) (*models.CensusResponse, error) {
+	start := time.Now()
+	conv := rates.NewRateConverter(req.InterestRate)
+
+	opts := reader.CSVOptions{
+		Header: true,
+		Limit:  req.Limit,
+	}
+	if req.Limit <= 0 {
+		opts.Limit = 0
+	}
+
+	var records []models.CensusRecordResult
+	totalPV := 0.0
+
+	err := reader.StreamCensusFromReader(strings.NewReader(csvContent), opts, func(rec reader.CensusRecord) {
+		pv := conv.PresentValue(rec.SumAssured, rec.Term)
+		totalPV += pv
+		records = append(records, models.CensusRecordResult{
+			Sex:          rec.Sex,
+			PolicyType:   rec.PolicyType,
+			Age:          rec.Age,
+			SumAssured:   rec.SumAssured,
+			Term:         rec.Term,
+			PresentValue: pv,
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	elapsed := time.Since(start).Milliseconds()
+	return &models.CensusResponse{
+		Records:      records,
+		TotalPV:      totalPV,
+		RecordCount:  len(records),
+		ProcessingMs: elapsed,
+	}, nil
 }
 
 func (s *CensusService) ProcessCensus(req models.CensusRequest) (*models.CensusResponse, error) {

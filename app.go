@@ -18,6 +18,7 @@ type App struct {
 	riskSvc       *services.RiskService
 	stochSvc      *services.StochasticService
 	censusSvc     *services.CensusService
+	profitSvc     *services.ProfitService
 }
 
 func NewApp() *App {
@@ -30,6 +31,7 @@ func NewApp() *App {
 		riskSvc:    services.NewRiskService(),
 		stochSvc:   services.NewStochasticService(),
 		censusSvc:  services.NewCensusService(),
+		profitSvc:  services.NewProfitService(mortSvc),
 	}
 }
 
@@ -129,6 +131,10 @@ func (a *App) LoadTableFromFile(name, filepath string) error {
 	return a.mortSvc.LoadTableFromFile(name, filepath)
 }
 
+func (a *App) LoadTableFromData(name, csvContent string) error {
+	return a.mortSvc.LoadTableFromData(name, csvContent)
+}
+
 // === Annuities ===
 
 func (a *App) CalcAnnuity(req models.AnnuityRequest) (models.AnnuityResponse, error) {
@@ -171,10 +177,20 @@ func (a *App) ProcessCensus(req models.CensusRequest) (*models.CensusResponse, e
 	return a.censusSvc.ProcessCensus(req)
 }
 
+func (a *App) ProcessCensusFromData(req models.CensusRequest, csvContent string) (*models.CensusResponse, error) {
+	return a.censusSvc.ProcessCensusFromData(req, csvContent)
+}
+
 func (a *App) ProcessCensusParallel(req models.CensusRequest) (*models.CensusResponse, error) {
 	return a.censusSvc.ProcessCensusParallel(req)
 }
 
 func (a *App) GetCSVHeaders(filePath string) ([]string, error) {
 	return a.censusSvc.GetCSVHeaders(filePath)
+}
+
+// === Profit Testing ===
+
+func (a *App) RunProfitTest(req models.ProfitRequest) (*models.ProfitResponse, error) {
+	return a.profitSvc.RunProfitTest(req)
 }

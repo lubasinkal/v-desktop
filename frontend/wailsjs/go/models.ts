@@ -292,6 +292,64 @@ export namespace models {
 	}
 	
 	
+	export class ProfitRequest {
+	    tableName: string;
+	    age: number;
+	    term: number;
+	    sumAssured: number;
+	    premium: number;
+	    earnedRate: number;
+	    discountRate: number;
+	    acquisitionExp: number;
+	    renewalExp: number;
+	    commissionRate: number;
+	    commissionYears: number;
+	    reserveEnabled: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new ProfitRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.tableName = source["tableName"];
+	        this.age = source["age"];
+	        this.term = source["term"];
+	        this.sumAssured = source["sumAssured"];
+	        this.premium = source["premium"];
+	        this.earnedRate = source["earnedRate"];
+	        this.discountRate = source["discountRate"];
+	        this.acquisitionExp = source["acquisitionExp"];
+	        this.renewalExp = source["renewalExp"];
+	        this.commissionRate = source["commissionRate"];
+	        this.commissionYears = source["commissionYears"];
+	        this.reserveEnabled = source["reserveEnabled"];
+	    }
+	}
+	export class ProfitResponse {
+	    profitSignature: number[];
+	    cumulativeProfit: number[];
+	    pvOfProfits: number;
+	    pvOfPremiums: number;
+	    profitMargin: number;
+	    irr: number;
+	    paybackYear: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ProfitResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.profitSignature = source["profitSignature"];
+	        this.cumulativeProfit = source["cumulativeProfit"];
+	        this.pvOfProfits = source["pvOfProfits"];
+	        this.pvOfPremiums = source["pvOfPremiums"];
+	        this.profitMargin = source["profitMargin"];
+	        this.irr = source["irr"];
+	        this.paybackYear = source["paybackYear"];
+	    }
+	}
 	export class RateConvertRequest {
 	    fromValue: number;
 	    fromType: string;

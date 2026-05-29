@@ -8,6 +8,7 @@ let lxChart = null
 let _mortData = null
 let _mortPage = 0
 let _mortPageSize = 20
+let _pendingFileContent = null // CSV content from HTML file input fallback
 
 function id(s) { return document.getElementById(s) }
 
@@ -34,9 +35,16 @@ export async function init(container) {
         <div class="result-box" id="mort-query-result"></div>
       </div>
       <div class="card">
-        <h3>Load Custom</h3>
+        <h3>Load Custom Table</h3>
         <div class="field"><label>Table Name</label><input id="mort-custom-name" type="text" placeholder="my_table"></div>
-        <button id="mort-load-btn" onclick="window._mortLoadFile()">Select CSV File</button>
+        <div class="field"><label>CSV File Path</label>
+          <div style="display:flex;gap:8px">
+            <input id="mort-custom-path" type="text" placeholder="path/to/table.csv" style="flex:1">
+            <button id="mort-browse-btn" onclick="window._mortBrowse()" class="btn-secondary" style="white-space:nowrap">Browse</button>
+            <input id="mort-file-input" type="file" accept=".csv" style="display:none" onchange="window._mortFileSelected(event)">
+          </div>
+        </div>
+        <button id="mort-load-btn" onclick="window._mortLoadPath()">Load Table</button>
         <div class="result-box" id="mort-load-result"></div>
       </div>
     </div>
@@ -96,23 +104,62 @@ export async function init(container) {
     finally { setButtonLoading(id('mort-query-btn'), false) }
   }
 
-  window._mortLoadFile = async () => {
-    const name = id('mort-custom-name').value
-    if (!name) { showToast('Enter a table name first', 'warning'); return }
-    setButtonLoading(id('mort-load-btn'), true)
+  window._mortBrowse = async () => {
     try {
       const result = await window.runtime.OpenFileDialog({
         filters: [{ displayName: 'CSV Files', pattern: '*.csv' }],
         properties: ['openFile'],
       })
       if (result) {
-        await window.go.main.App.LoadTableFromFile(name, result)
-        id('mort-load-result').textContent = `Loaded "${name}"`
-        showToast(`Table "${name}" loaded`, 'success')
-        const names = await window.go.main.App.GetTableNames()
-        id('mort-table').innerHTML = names.map(n => `<option>${n}</option>`).join('')
-        window._mortLoad()
+        id('mort-custom-path').value = result
+        _pendingFileContent = null
+        showToast('File selected', 'info')
       }
+    } catch (e) {
+      // Runtime dialog unavailable (dev mode) — use HTML file input fallback
+      id('mort-file-input').click()
+    }
+  }
+
+  window._mortFileSelected = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    id('mort-custom-path').value = file.name
+    // Read file content for backend processing
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      _pendingFileContent = e.target.result
+      showToast('File loaded: ' + file.name, 'success')
+    }
+    reader.onerror = () => {
+      showToast('Failed to read file', 'error')
+    }
+    reader.readAsText(file)
+    event.target.value = ''
+  }
+
+  window._mortLoadPath = async () => {
+    const name = id('mort-custom-name').value
+    const path = id('mort-custom-path').value
+    if (!name) { showToast('Enter a table name', 'warning'); return }
+    if (!path) { showToast('Enter a file path', 'warning'); return }
+    setButtonLoading(id('mort-load-btn'), true)
+    try {
+      if (_pendingFileContent) {
+        // Use in-memory content (dev mode via HTML file input)
+        await window.go.main.App.LoadTableFromData(name, _pendingFileContent)
+        _pendingFileContent = null
+      } else {
+        // Use file path (production mode via runtime dialog)
+        await window.go.main.App.LoadTableFromFile(name, path)
+      }
+      id('mort-load-result').textContent = `Loaded "${name}"`
+      showToast(`Table "${name}" loaded`, 'success')
+      const names = await window.go.main.App.GetTableNames()
+      id('mort-table').innerHTML = names.map(n => `<option>${n}</option>`).join('')
+      window._mortLoad()
+      // Notify other tabs that the table list changed
+      window.dispatchEvent(new CustomEvent('tables-updated'))
     } catch (e) {
       id('mort-load-result').textContent = 'Error: ' + e
       showToast('Failed to load file', 'error')
@@ -170,6 +217,16 @@ export async function init(container) {
   window._copyText = async text => {
     if (await copyToClipboard(text)) showToast('Copied', 'success')
   }
+
+  window.addEventListener('tables-updated', async () => {
+    const names = await window.go.main.App.GetTableNames()
+    const sel = id('mort-table')
+    if (sel && names.length > 0) {
+      const current = sel.value
+      sel.innerHTML = names.map(n => `<option>${n}</option>`).join('')
+      if (!names.includes(current)) window._mortLoad()
+    }
+  })
 
   setTimeout(() => window._mortLoad(), 100)
 }

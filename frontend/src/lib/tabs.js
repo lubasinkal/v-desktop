@@ -8,6 +8,7 @@ const TABS = [
   { id: 'risk', label: 'Risk' },
   { id: 'census', label: 'Census' },
   { id: 'rate-converter', label: 'Rates' },
+  { id: 'profit', label: 'Profit' },
 ]
 
 export function renderNav(container) {

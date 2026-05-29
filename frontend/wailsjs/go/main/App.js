@@ -70,6 +70,10 @@ export function InterestFromForce(arg1) {
   return window['go']['main']['App']['InterestFromForce'](arg1);
 }
 
+export function LoadTableFromData(arg1, arg2) {
+  return window['go']['main']['App']['LoadTableFromData'](arg1, arg2);
+}
+
 export function LoadTableFromFile(arg1, arg2) {
   return window['go']['main']['App']['LoadTableFromFile'](arg1, arg2);
 }
@@ -88,6 +92,10 @@ export function NominalToEffective(arg1, arg2) {
 
 export function ProcessCensus(arg1) {
   return window['go']['main']['App']['ProcessCensus'](arg1);
+}
+
+export function ProcessCensusFromData(arg1, arg2) {
+  return window['go']['main']['App']['ProcessCensusFromData'](arg1, arg2);
 }
 
 export function ProcessCensusParallel(arg1) {
@@ -112,6 +120,10 @@ export function QueryQx(arg1, arg2) {
 
 export function RunGBM(arg1) {
   return window['go']['main']['App']['RunGBM'](arg1);
+}
+
+export function RunProfitTest(arg1) {
+  return window['go']['main']['App']['RunProfitTest'](arg1);
 }
 
 export function RunVasicek(arg1) {
