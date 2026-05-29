@@ -90,11 +90,18 @@ Full profit-signature projection with annual premium, expenses (acquisition + re
 
 ## Screenshots
 
-![v-desktop dashboard](assets/app/dashboard.png)
-
-*Dashboard — quick calculators and system overview on launch.*
-
-*Additional screenshots of individual tabs can be found in the project wiki.*
+| | |
+|---|---|
+| ![Dashboard](assets/app/dashboard.png) | ![PV & Duration](assets/app/pv_and_duration.png) |
+| *Dashboard — quick calculators and launchpad* | *Present value, duration, convexity* |
+| ![Annuity Calculator](assets/app/annuity_calculator.png) | ![Reserve Calculator](assets/app/reserve_calculator.png) |
+| *10 annuity types with configurable parameters* | *Net premium, prospective, retrospective reserves* |
+| ![Monte Carlo 1](assets/app/montecarlo_1.png) | ![Monte Carlo 2](assets/app/montecarlo_2.png) |
+| *GBM and Vasicek path simulations* | *Terminal value and parameter distributions* |
+| ![Profit Test 1](assets/app/profit_test1.png) | ![Profit Test 2](assets/app/profit_test2.png) |
+| *Profit signature, PV of profits, IRR, payback* | *Cashflow projection with reserves* |
+| ![Boot Screen](assets/app/load_screen.png) | |
+| *Terminal-style startup animation* | |
 
 ---
 
