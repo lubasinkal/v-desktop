@@ -17,7 +17,7 @@ export function init(container) {
             <button onclick="window._censusBrowse()" class="btn-secondary" style="white-space:nowrap">Browse</button>
             <input id="census-file-input" type="file" accept=".csv" style="display:none" onchange="window._censusFileSelected(event)">
           </div>
-          <span class="field-hint">Expected columns: age, sex, policy_type, sum_assured, term</span>
+          <span class="field-hint">Columns: age, sex (male/female), policy_type (term/whole_life/endowment), sum_assured, term</span>
         </div>
         <div class="calc-grid" style="gap:8px">
           <div class="field"><label>Rate</label><input id="census-rate" type="number" value="0.05" step="0.001" min="0" max="1"></div>

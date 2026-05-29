@@ -43,7 +43,7 @@ export async function init(container) {
             <button id="mort-browse-btn" onclick="window._mortBrowse()" class="btn-secondary" style="white-space:nowrap">Browse</button>
             <input id="mort-file-input" type="file" accept=".csv" style="display:none" onchange="window._mortFileSelected(event)">
           </div>
-          <span class="field-hint">Expected columns: age, qx (or age, px)</span>
+          <span class="field-hint">Columns: age, qx (0–1 mortality rate) &nbsp;or&nbsp; age, px (0–1 survival rate)</span>
         </div>
         <button id="mort-load-btn" onclick="window._mortLoadPath()">Load Table</button>
         <div class="result-box" id="mort-load-result"></div>
