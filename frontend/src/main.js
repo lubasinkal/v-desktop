@@ -20,7 +20,7 @@ boot.id = 'boot'
 boot.innerHTML = `
   <div class="boot-frame">
     <div class="boot-title">V-<span>DESKTOP</span></div>
-    <div class="boot-version">v0.4.4</div>
+    <div class="boot-version">v0.4.5</div>
     <div class="boot-lines" id="boot-lines"></div>
   </div>`
 document.body.prepend(boot)
