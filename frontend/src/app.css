@@ -2,7 +2,8 @@
 #app {
   position: relative;
   min-height: 100vh;
-  padding: 0 24px 48px;
+  padding: 0 24px 64px;
+  overscroll-behavior: none;
 }
 
 main {
@@ -173,7 +174,6 @@ h3 {
 
 .card:hover {
   border-color: rgba(60, 255, 208, 0.3);
-  transform: translateY(-1px);
 }
 
 .card-accent {
