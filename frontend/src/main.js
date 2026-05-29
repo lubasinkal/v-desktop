@@ -14,6 +14,67 @@ import * as census from './components/census.js'
 import * as rateConverter from './components/rate-converter.js'
 import * as profit from './components/profit.js'
 
+// ─── Boot animation ───
+const boot = document.createElement('div')
+boot.id = 'boot'
+boot.innerHTML = `
+  <div class="boot-frame">
+    <div class="boot-title">V-<span>DESKTOP</span></div>
+    <div class="boot-version">v0.4.4</div>
+    <div class="boot-lines" id="boot-lines"></div>
+  </div>`
+document.body.prepend(boot)
+
+const bootLines = [
+  { text: 'loading mortality tables...', ok: true },
+  { text: 'initializing modules...', ok: true },
+  { text: 'connecting to runtime...', ok: true },
+  { text: 'ready.', ok: true, last: true },
+]
+
+const lineContainer = document.getElementById('boot-lines')
+const cursor = document.createElement('span')
+cursor.className = 'boot-cursor'
+
+function showBoot() {
+  let idx = 0
+  const addNext = () => {
+    if (idx >= bootLines.length) {
+      // All lines shown — brief pause, then dismiss
+      setTimeout(() => {
+        cursor.remove()
+        boot.classList.add('done')
+        setTimeout(() => boot.remove(), 800)
+      }, 400)
+      return
+    }
+    const line = bootLines[idx]
+    const el = document.createElement('div')
+    el.className = 'boot-line'
+    el.style.animationDelay = '0s'
+    el.innerHTML = `<span class="prompt">◆</span> ${line.text}${line.ok ? ' <span class="ok">✓</span>' : ''}`
+    lineContainer.appendChild(el)
+    idx++
+
+    if (idx === bootLines.length && line.last) {
+      cursor.remove()
+      setTimeout(() => {
+        boot.classList.add('done')
+        setTimeout(() => boot.remove(), 800)
+      }, 500)
+    } else {
+      setTimeout(addNext, 180)
+    }
+  }
+
+  // Start with cursor blinking
+  lineContainer.appendChild(cursor)
+  setTimeout(addNext, 300)
+}
+
+showBoot()
+
+// ─── Main app ───
 const appEl = document.querySelector('#app')
 appEl.innerHTML = ''
 
