@@ -3,7 +3,7 @@ module v-desktop
 go 1.26.1
 
 require (
-	github.com/lubasinkal/v-star v0.9.3
+	github.com/lubasinkal/v-star v0.9.4
 	github.com/wailsapp/wails/v2 v2.12.0
 )
 
