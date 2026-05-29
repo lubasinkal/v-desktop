@@ -32,6 +32,8 @@ github.com/lubasinkal/v-star v0.9.1 h1:pfFHMyMWefU9NX7iTrC7tdDXf2ZKrL7hkiLvVpNU3
 github.com/lubasinkal/v-star v0.9.1/go.mod h1:lNAWLUN9+rYZFgR8ZpfY0mOEcAf35oM9t1gkI247EPo=
 github.com/lubasinkal/v-star v0.9.2 h1:VqQK+9Xrfv4c24IogGA1U4dI4ra+KSM4DFerDmsQIDk=
 github.com/lubasinkal/v-star v0.9.2/go.mod h1:lNAWLUN9+rYZFgR8ZpfY0mOEcAf35oM9t1gkI247EPo=
+github.com/lubasinkal/v-star v0.9.3 h1:J9Zz4H8iMtOJH8iTF0GZFBHbDguZrVFSPcOQLEX8hB4=
+github.com/lubasinkal/v-star v0.9.3/go.mod h1:lNAWLUN9+rYZFgR8ZpfY0mOEcAf35oM9t1gkI247EPo=
 github.com/matryer/is v1.4.0/go.mod h1:8I/i5uYgLzgsgEloJE1U6xx5HkBQpAZvepWuujKwMRU=
 github.com/matryer/is v1.4.1 h1:55ehd8zaGABKLXQUe2awZ99BD/PTc2ls+KV/dXphgEQ=
 github.com/matryer/is v1.4.1/go.mod h1:8I/i5uYgLzgsgEloJE1U6xx5HkBQpAZvepWuujKwMRU=
